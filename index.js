@@ -1,15 +1,16 @@
 var async = require('async');
 
 var getEvent = require('./lib/event').getEvent;
+var getGauge = require('./lib/gauge').getGauge;
 var Timer = require('./lib/timer').Timer;
 
 var handlers = {
   events: [],
-  timers: []
+  timers: [],
+  gauges: []
 };
 
-var moduleHandlers = {
-};
+var moduleHandlers = {};
 
 
 function Zither(moduleName) {
@@ -18,7 +19,8 @@ function Zither(moduleName) {
 
   moduleHandlers[moduleName] = {
     events: [],
-    timers: []
+    timers: [],
+    gauges: []
   };
 };
 
@@ -52,18 +54,24 @@ Zither.prototype.dispatchHandlers = function(type, obj) {
     }
   }, function(err) {
     if (errs.length) {
-      console.log('Error calling handler', eventErrs[0]);
+      console.log('Error calling handler', errs[0]);
     }
   });
 
 };
 
 Zither.prototype.recordEvent = function(label) {
-  var event = getEvent([this.moduleName, label].join(':'));
+  var event = getEvent([this.moduleName, label].join('.'));
 
   event.record();
-
   this.dispatchHandlers('events', event);
+};
+
+Zither.prototype.setGauge = function(label, value) {
+  var gauge = getGauge([this.moduleName, label].join('.'));
+
+  gauge.set(value);
+  this.dispatchHandlers('gauges', gauge);
 };
 
 Zither.prototype.work = function(label) {
@@ -77,13 +85,17 @@ Zither.prototype.work = function(label) {
   return workTimer;
 };
 
-Zither.prototype.registerPlugin = function(plugin) {
-  if (plugin.hasOwnProperty('event') && typeof plugin.event === 'function') {
+Zither.prototype.register = function(plugin) {
+  if (plugin.event && typeof plugin.event === 'function') {
     moduleHandlers[this.moduleName].events.push(plugin.event);
   }
 
-  if (plugin.hasOwnProperty('timer') && typeof plugin.timer === 'function') {
+  if (plugin.timer && typeof plugin.timer === 'function') {
     moduleHandlers[this.moduleName].timers.push(plugin.timer);
+  }
+
+  if (plugin.gauge && typeof plugin.gauge === 'function') {
+    moduleHandlers[this.moduleName].gauges.push(plugin.gauge);
   }
 };
 
@@ -93,12 +105,16 @@ exports.instrument = function(modulename) {
   return zither;
 };
 
-exports.registerPlugin = function(plugin) {
-  if (plugin.hasOwnProperty('event') && typeof plugin.event === 'function') {
+exports.register = function(plugin) {
+  if (plugin.event && typeof plugin.event === 'function') {
     handlers.events.push(plugin.event);
   }
 
-  if (plugin.hasOwnProperty('timer') && typeof plugin.timer === 'function') {
+  if (plugin.timer && typeof plugin.timer === 'function') {
     handlers.timers.push(plugin.timer);
+  }
+
+  if (plugin.gauge && typeof plugin.gauge === 'function') {
+    handlers.gauges.push(plugin.gauge);
   }
 }
