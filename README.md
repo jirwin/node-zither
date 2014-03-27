@@ -69,3 +69,8 @@ function example2() {
 
 exports.example2 = example2;
 ```
+
+## Feature Hopefuls
+* Sampling
+* Metric queues
+* Alerting?
