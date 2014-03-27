@@ -6,6 +6,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "homepage": "https://github.com/jirwin/node-zither",
+  "repository" : {
+    "type" : "git",
+    "url" : "http://github.com/jirwin/node-zither.git"
+  }
   "author": "Justin Gallardo <justin.gallardo@gmail.com>",
   "license": "Apache 2.0",
   "dependencies": {
