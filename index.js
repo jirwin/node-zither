@@ -118,3 +118,5 @@ exports.register = function(plugin) {
     handlers.gauges.push(plugin.gauge);
   }
 }
+
+exports.StatsD = require('./lib/statsd').StatsD;
