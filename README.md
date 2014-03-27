@@ -10,7 +10,6 @@ Here are some useless examples:
 var zither = require('zither');
 var instruments = zither.instrument('zither.example');
 var ex2 = require('./example2').example2;
-var StatsD = require('./lib/statsd').StatsD; // StatsD plugin
 
 // Register a basic console plugin for each type that is global
 zither.register({
@@ -31,7 +30,7 @@ zither.register({
 });
 
 // Register the StatsD plugin globally
-zither.register(new StatsD());
+zither.register(new zither.StatsD());
 
 function main() {
   setInterval(function() {
