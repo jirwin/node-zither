@@ -1,7 +1,7 @@
 {
   "name": "zither",
   "version": "0.0.1",
-  "description": "A simple middleware for emitting metrics from node applications.",
+  "description": "A simple tool for instrumenting code",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -9,6 +9,7 @@
   "author": "Justin Gallardo <justin.gallardo@gmail.com>",
   "license": "Apache 2.0",
   "dependencies": {
-    "async": "~0.2.10"
+    "async": "~0.2.10",
+    "node-statsd": "0.0.7"
   }
 }
