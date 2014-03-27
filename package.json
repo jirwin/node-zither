@@ -10,7 +10,7 @@
   "repository" : {
     "type" : "git",
     "url" : "http://github.com/jirwin/node-zither.git"
-  }
+  },
   "author": "Justin Gallardo <justin.gallardo@gmail.com>",
   "license": "Apache 2.0",
   "dependencies": {
