@@ -1,122 +1,55 @@
 var async = require('async');
+var through = require('through');
 
-var getEvent = require('./lib/event').getEvent;
-var getGauge = require('./lib/gauge').getGauge;
-var Timer = require('./lib/timer').Timer;
+var Event = require('./lib/event');
+var Gauge = require('./lib/gauge');
+var Timer = require('./lib/timer');
 
-var handlers = {
-  events: [],
-  timers: [],
-  gauges: []
-};
-
-var moduleHandlers = {};
+var zStream = null;
 
 
-function Zither(moduleName) {
-  this.moduleName = moduleName;
-  this.events = {};
-
-  moduleHandlers[moduleName] = {
-    events: [],
-    timers: [],
-    gauges: []
-  };
-};
-
-Zither.prototype.dispatchHandlers = function(type, obj) {
-  var errs = [],
-      objHandlers = [];
-
-  function captureHandlerErrors(callback) {
-    return function() {
-      var args = Array.prototype.slice.call(arguments);
-
-      if (args[0]) {
-        errs.push(args[0]);
-        args = args.splice(0, 1, null);
-      }
-
-      callback.apply(null, args);
-    };
-  }
-
-  objHandlers = objHandlers.concat(handlers[type], moduleHandlers[this.moduleName][type]);
-
-  async.each(objHandlers, function(objHandler, callback) {
-    callback = captureHandlerErrors(callback);
-
-    try {
-      objHandler(obj, callback);
-    } catch (err) {
-      callback(err);
-      return;
-    }
-  }, function(err) {
-    if (errs.length) {
-      console.log('Error calling handler', errs[0]);
-    }
-  });
-
+function Zither(module) {
+  this.module = module;
 };
 
 Zither.prototype.recordEvent = function(label) {
-  var event = getEvent([this.moduleName, label].join('.'));
+  var event = new Event(this.module, label);
 
-  event.record();
-  this.dispatchHandlers('events', event);
+  zStream.queue(event.get());
 };
 
 Zither.prototype.setGauge = function(label, value) {
-  var gauge = getGauge([this.moduleName, label].join('.'));
+  var gauge = new Gauge(this.module, label);
 
-  gauge.set(value);
-  this.dispatchHandlers('gauges', gauge);
+  zStream.queue(gauge.set(value));
 };
 
 Zither.prototype.work = function(label) {
   var self = this,
-      workTimer = new Timer(label);
+      workTimer = new Timer(this.module, label);
 
   workTimer.once('stop', function(timer) {
-    self.dispatchHandlers('timers', timer);
+    zStream.queue(timer);
   });
 
+  zStream.queue(workTimer.start());
   return workTimer;
 };
 
-Zither.prototype.register = function(plugin) {
-  if (plugin.event && typeof plugin.event === 'function') {
-    moduleHandlers[this.moduleName].events.push(plugin.event);
-  }
 
-  if (plugin.timer && typeof plugin.timer === 'function') {
-    moduleHandlers[this.moduleName].timers.push(plugin.timer);
-  }
-
-  if (plugin.gauge && typeof plugin.gauge === 'function') {
-    moduleHandlers[this.moduleName].gauges.push(plugin.gauge);
-  }
-};
-
-exports.instrument = function(modulename) {
-  var zither = new Zither(modulename);
+exports.instrument = function(module) {
+  var zither = new Zither(module);
 
   return zither;
 };
 
-exports.register = function(plugin) {
-  if (plugin.event && typeof plugin.event === 'function') {
-    handlers.events.push(plugin.event);
+exports.createStream = function() {
+  if (!zStream) {
+    zStream = through();
   }
 
-  if (plugin.timer && typeof plugin.timer === 'function') {
-    handlers.timers.push(plugin.timer);
-  }
+  return zStream;
+};
 
-  if (plugin.gauge && typeof plugin.gauge === 'function') {
-    handlers.gauges.push(plugin.gauge);
-  }
-}
 
 exports.StatsD = require('./lib/statsd').StatsD;
