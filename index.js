@@ -5,7 +5,7 @@ var Event = require('./lib/event');
 var Gauge = require('./lib/gauge');
 var Timer = require('./lib/timer');
 
-var zStream = null;
+var _zStream = null;
 
 
 function Zither(module) {
@@ -14,14 +14,12 @@ function Zither(module) {
 
 Zither.prototype.recordEvent = function(label) {
   var event = new Event(this.module, label);
-
-  zStream.queue(event.get());
+  _zStream.queue(event.get());
 };
 
 Zither.prototype.setGauge = function(label, value) {
   var gauge = new Gauge(this.module, label);
-
-  zStream.queue(gauge.set(value));
+  _zStream.queue(gauge.set(value));
 };
 
 Zither.prototype.work = function(label) {
@@ -29,26 +27,24 @@ Zither.prototype.work = function(label) {
       workTimer = new Timer(this.module, label);
 
   workTimer.once('stop', function(timer) {
-    zStream.queue(timer);
+    _zStream.queue(timer);
   });
 
-  zStream.queue(workTimer.start());
+  _zStream.queue(workTimer.start());
   return workTimer;
 };
 
 
 exports.instrument = function(module) {
   var zither = new Zither(module);
-
   return zither;
 };
 
 exports.createStream = function() {
-  if (!zStream) {
-    zStream = through();
+  if (!_zStream) {
+    _zStream = through();
   }
-
-  return zStream;
+  return _zStream;
 };
 
 
