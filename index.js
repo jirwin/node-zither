@@ -1,51 +1,22 @@
-var async = require('async');
 var through = require('through');
+var _ = require('highland');
 
-var Event = require('./lib/event');
-var Gauge = require('./lib/gauge');
-var Timer = require('./lib/timer');
+var Instrument = require('./lib/instrument').Instrument;
 
-var _zStream = null;
+var inputStreams = through();
+var zStream = _(inputStreams).merge();
 
+zStream.resume();
 
-function Zither(module) {
-  this.module = module;
-};
+// The main stream won't start flowing until it directly has something attached to it.
+// Observers don't count.
+zStream.pipe(through());
 
-Zither.prototype.recordEvent = function(label) {
-  var event = new Event(this.module, label);
-  _zStream.queue(event.get());
-};
-
-Zither.prototype.setGauge = function(label, value) {
-  var gauge = new Gauge(this.module, label);
-  _zStream.queue(gauge.set(value));
-};
-
-Zither.prototype.work = function(label) {
-  var self = this,
-      workTimer = new Timer(this.module, label);
-
-  workTimer.once('stop', function(timer) {
-    _zStream.queue(timer);
-  });
-
-  _zStream.queue(workTimer.start());
-  return workTimer;
-};
-
-
-exports.instrument = function(module) {
-  var zither = new Zither(module);
+exports.instrument = function(id) {
+  var zither = new Instrument(id, inputStreams);
   return zither;
 };
 
-exports.createStream = function() {
-  if (!_zStream) {
-    _zStream = through();
-  }
-  return _zStream;
+exports.pipe = function(dst) {
+  return zStream.observe().pipe(dst);
 };
-
-
-exports.StatsD = require('./lib/statsd').StatsD;

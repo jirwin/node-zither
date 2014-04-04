@@ -1,20 +1,20 @@
 {
   "name": "zither",
-  "version": "0.0.3",
-  "description": "A simple tool for instrumenting code",
+  "version": "0.1.0",
+  "description": "A stream based instrumentation tool",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node_modules/tape/bin/tape test/*.js"
   },
   "homepage": "https://github.com/jirwin/node-zither",
-  "repository" : {
-    "type" : "git",
-    "url" : "http://github.com/jirwin/node-zither.git"
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/jirwin/node-zither.git"
   },
   "author": "Justin Gallardo <justin.gallardo@gmail.com>",
   "license": "Apache 2.0",
   "dependencies": {
-    "async": "~0.2.10",
-    "node-statsd": "0.0.7"
+    "highland": "^1.19.1",
+    "through": "^2.3.4"
   }
 }
