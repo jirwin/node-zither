@@ -6,16 +6,29 @@ Here are some useless examples:
 
 ```javascript
 // example.js
+var _ = require('highland');
+var through = require('through');
 
 var zither = require('./index');
 var instruments = zither.instrument('test.zither');
 var instruments2 = zither.instrument('test.zither2');
-var _ = require('highland');
-var through = require('through');
 
-zither.pipe(through(function(buf) {
+var formatForConsole = through(function(buf) {
   this.queue(JSON.stringify(buf) + '\n');
+});
+
+var z1 = _(zither.pipe(through()));
+var z2 = _(zither.pipe(through()));
+
+// Print all timer events from the zither stream to the console
+z1.where({type: 'timer'}).pipe(formatForConsole).pipe(process.stdout);
+
+
+// Print all events from test.zither input stream to the console in uppercase
+z2.where({inputSource: 'test.zither'}).pipe(through(function(buf) {
+  this.queue(JSON.stringify(buf).toUpperCase() + '\n');
 })).pipe(process.stdout);
+
 
 function main() {
   var eventCount = 0,
@@ -28,12 +41,9 @@ function main() {
     instruments2.recordEvent('secondEvent');
   }
 
-  var work = instruments.work('foo.work.timer');
-
+  work = instruments.work('foo.work.timer');
   work.start();
-
   setTimeout(work.stop.bind(work), 550);
-
 }
 
 main()
@@ -42,27 +52,17 @@ main()
 Output:
 ```
 jirwin@shirley:~/projects/node-zither$ nodejs example.js 
-{"name":"test event","timestamp":1396646169595,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169596,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169596,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169598,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169598,"inputSource":"test.zither2","type":"event"}
-{"name":"test event","timestamp":1396646169598,"inputSource":"test.zither","type":"event"}
-{"name":"secondEvent","timestamp":1396646169599,"inputSource":"test.zither2","type":"event"}
-{"name":"foo.work.timer","startTime":1396646169599,"endTime":null,"duration":null,"state":"start","inputSource":"test.zither","type":"timer"}
-{"name":"foo.work.timer","startTime":1396646169599,"endTime":1396646170151,"duration":552,"state":"end","inputSource":"test.zither","type":"timer"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876749,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876750,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876750,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876750,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876751,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876751,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876752,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876752,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876753,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+FROM INPUT SOURCE TEST.ZITHER: {"NAME":"TEST EVENT","TIMESTAMP":1396648876753,"TYPE":"EVENT","INPUTSOURCE":"TEST.ZITHER"}
+from input source test.zither2: {"name":"foo.work.timer","startTime":1396648876753,"endTime":null,"duration":null,"state":"start","type":"timer","inputSource":"test.zither2"}
+from input source test.zither2: {"name":"foo.work.timer","startTime":1396648876753,"endTime":1396648877305,"duration":552,"state":"end","type":"timer","inputSource":"test.zither2"}
 ```
 
