@@ -38,3 +38,31 @@ function main() {
 
 main()
 ```
+
+Output:
+```
+jirwin@shirley:~/projects/node-zither$ nodejs example.js 
+{"name":"test event","timestamp":1396646169595,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169596,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169596,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169597,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169597,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169598,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169598,"inputSource":"test.zither2","type":"event"}
+{"name":"test event","timestamp":1396646169598,"inputSource":"test.zither","type":"event"}
+{"name":"secondEvent","timestamp":1396646169599,"inputSource":"test.zither2","type":"event"}
+{"name":"foo.work.timer","startTime":1396646169599,"endTime":null,"duration":null,"state":"start","inputSource":"test.zither","type":"timer"}
+{"name":"foo.work.timer","startTime":1396646169599,"endTime":1396646170151,"duration":552,"state":"end","inputSource":"test.zither","type":"timer"}
+```
+
