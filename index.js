@@ -2,7 +2,7 @@ var through = require('through');
 var _ = require('highland');
 
 var Instrument = require('./lib/instrument').Instrument;
-var ZitherStatsd = require('./lib/statsd').ZitherStatsD;
+var ZitherStatsd = require('./lib/statsd').ZitherStatsd;
 
 var inputStreams = through();
 var zStream = _(inputStreams).merge();
