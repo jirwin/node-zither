@@ -2,6 +2,7 @@ var through = require('through');
 var _ = require('highland');
 
 var Instrument = require('./lib/instrument').Instrument;
+var ZitherStatsd = require('./lib/statsd').ZitherStatsD;
 
 var inputStreams = through();
 var zStream = _(inputStreams).merge();
@@ -20,3 +21,5 @@ exports.instrument = function(id) {
 exports.pipe = function(dst) {
   return zStream.observe().pipe(dst);
 };
+
+exports.ZitherStatsd = ZitherStatsd;
