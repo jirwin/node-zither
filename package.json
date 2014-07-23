@@ -1,6 +1,6 @@
 {
   "name": "zither",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "A stream based instrumentation tool",
   "main": "index.js",
   "scripts": {
